@@ -46,6 +46,10 @@ public class LoginController {
             return "{\"error\" : \"Incorrect password!\"}";
         }
 
+        if(!u.getActive().equals(User.Active.ACTIVE)){
+            return "{\"error\" : \"Account is NonActive or Banned!\"}";
+        }
+
         u.setLastLogin(new Date());
         userRepository.save(u);
 
