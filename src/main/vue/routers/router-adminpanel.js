@@ -9,7 +9,6 @@ import clubs from 'components/clubs.vue'
 
 
 const routes = [
-    { path: '/adminpanel', component: overview },
     { path: '/adminpanel/overview', component: overview },
     { path: '/adminpanel/users', component: users },
     { path: '/adminpanel/clubs', component: clubs }

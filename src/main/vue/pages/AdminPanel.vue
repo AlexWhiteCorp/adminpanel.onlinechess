@@ -36,7 +36,7 @@
         },
         mounted(){
             let component = this;
-            component.push('/adminpanel/overview');
+            if(document.location.pathname === '/adminpanel' || document.location.pathname === '/') component.push('/adminpanel/overview');
             let mainWrapper = document.getElementById('main-wrapper');
             window.mainWrapper = mainWrapper;
 

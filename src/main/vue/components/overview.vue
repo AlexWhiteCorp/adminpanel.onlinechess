@@ -8,16 +8,6 @@
         <graph-card card-id="5" name="Players Online" api-path="snapshot" var-name="playersOnline"></graph-card>
         <graph-card card-id="6" name="CPU Usage" api-path="snapshot" var-name="cpuUsage"></graph-card>
         <graph-card card-id="7" name="RAM Usage" api-path="snapshot" var-name="ramUsage"></graph-card>
-
-        <div class="content-card card-7-column">5</div>
-        <div class="content-card card-5-column">6</div>
-
-        <div class="content-card card-6-column">7</div>
-        <div class="content-card card-6-column">8</div>
-
-        <div class="content-card card-4-column">9</div>
-        <div class="content-card card-4-column">10</div>
-        <div class="content-card card-4-column">11</div>
     </div>
 </template>
 <script>
@@ -42,6 +32,8 @@
             const DATA_LOAD_TIME = 5 * 1000;
             let component = this;
 
+            if(window.RequestTimer !== undefined) clearInterval(window.RequestTimer);
+
             requestInfo();
 
             function requestInfo() {
@@ -49,7 +41,11 @@
                 axios
                     .get(window.getRestPath('overview'))
                     .then(function (responce) {
-                        loadInfo(responce.data);
+                        try {
+                            loadInfo(responce.data);
+                        }
+                        catch (e) {
+                        }
                         let timer, timePassed, start = Date.now();
                         timer = setInterval(function() {
                             timePassed = Date.now() - start;
@@ -60,6 +56,7 @@
                             }
                             setLoadTime(Math.round((DATA_LOAD_TIME - timePassed) / 1000));
                         }, 1000);
+                        window.RequestTimer = timer;
                     });
             }
 

@@ -14,7 +14,7 @@
                 Save
             </div>
         </div>
-        <div class="users-table">
+        <div id="users-table" class="users-table scrollable">
             <div id="users-table-filters" class="users-table-line users-table-filters">
                 <input type="text" class="users-table-cell user-id new-record-field" placeholder="All"/>
                 <input type="text" class="users-table-cell user-nickname new-record-field" placeholder="All"/>
@@ -38,7 +38,7 @@
                 <div class="users-table-cell user-last-login disabled-field"></div>
                 <div id="filters-cancel" class="users-table-cell user-options">Cancel</div>
             </div>
-            <div class="users-table-header users-table-line">
+            <div id="users-table-header" class="users-table-header users-table-line">
                 <div class="users-table-cell">Id</div>
                 <div class="users-table-cell">Nickname</div>
                 <div class="users-table-cell">Password</div>
@@ -68,7 +68,7 @@
                 <div class="users-table-cell user-last-login disabled-field"></div>
                 <div id="new-record-cancel" class="users-table-cell user-options">Cancel</div>
             </div>
-            <div id="users-table-content" class="users-table-content scrollable"></div>
+            <div id="users-table-content" class="users-table-content"></div>
         </div>
     </div>
 </template>
@@ -103,6 +103,7 @@
             let newAccountButton = document.getElementById('new-account-button');
 
             let newRecordDiv = document.getElementById('users-table-new-record');
+            let tableHeaderDiv = document.getElementById('users-table-header');
             let filtersDiv = document.getElementById('users-table-filters');
 
             let id = card.getAttribute('card-id').toLowerCase().replace(/ /g, '-');
@@ -113,11 +114,12 @@
             });
 
             card.style.minHeight = document.getElementById('content-wrapper').offsetHeight - 110 + 'px';
-            card.style.maxHeight = document.getElementById('content-wrapper').offsetHeight - 110 + 'px';
+            document.getElementById('users-table').style.maxHeight = document.getElementById('content-wrapper').offsetHeight - 150 + 'px';
 
             usersTableContent.style.minHeight = document.getElementById('content-wrapper').offsetHeight - 200 + 'px';
             usersTableContent.style.maxHeight = document.getElementById('content-wrapper').offsetHeight - 200 + 'px';
 
+            
             function request(path, params, onResult) {
                 axios
                     .get(window.getRestPath(path), {params: params})
@@ -527,6 +529,7 @@
 </script>
 <style scoped>
     .users-crud-card{
+        height: fit-content;
     }
 
     .crud-options-wrapper{
@@ -626,7 +629,7 @@
     }
 
     .users-table{
-        overflow-x: auto;
+        overflow: auto;
     }
 
     .users-table-header{
@@ -638,6 +641,11 @@
 
     .users-table-content{
         overflow-y: auto;
+    }
+
+    .users-table-content::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
     }
 
     .users-table-record{
@@ -796,6 +804,12 @@
     }
 
     @media screen and (max-width: 641px){
+
+        .users-table-content{
+            min-width: fit-content;
+            max-width: fit-content;
+        }
+
         .users-table-line{
             border: none;
             grid-template-columns: 60px 150px 150px 140px 120px 150px 100px;
@@ -810,7 +824,7 @@
         }
 
         .content-card{
-            padding: 5px 0px 0px 0px;
+            padding: 5px 0px 5px 0px;
         }
 
         .option-button{
@@ -820,5 +834,13 @@
         .new-account-button{
             margin-right: 5px;
         }
+
+        .users-table-new-record{
+            background: #4b5051;
+            height: 0px;
+            overflow: hidden;
+            -webkit-transition: All 0.5s ease;
+        }
+
     }
 </style>
