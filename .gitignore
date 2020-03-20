@@ -1,0 +1,13 @@
+*.class
+*.jar
+target
+
+*.iml
+.idea
+
+.git
+
+*.txt
+ocap.png
+
+node_modules

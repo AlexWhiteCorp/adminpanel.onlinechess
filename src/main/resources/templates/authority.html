@@ -1,0 +1,9 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="~{parts/head :: head('Login | Online Chess', true, true)}"></head>
+<body>
+
+    <div id="authority"></div>
+    <script th:src="${isDevMode} ? 'http://localhost:8000/authority.bundle.js' : '/vue/authority.bundle.js'"></script>
+</body>
+</html>

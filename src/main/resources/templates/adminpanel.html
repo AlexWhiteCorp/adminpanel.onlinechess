@@ -1,0 +1,9 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="~{parts/head :: head('Admin Panel | Online Chess', true, true)}"></head>
+<body>
+
+    <div id="adminpanel"></div>
+    <script th:src="${isDevMode} ? 'http://localhost:8000/adminpanel.bundle.js' : '/vue/adminpanel.bundle.js'"></script>
+</body>
+</html>

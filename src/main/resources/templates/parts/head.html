@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Head block template with basic settings and title as param || Included in all pages -->
+    <div th:fragment="head(title, is_header, is_footer)">
+        <meta charset="UTF-8">
+        <meta name="theme-color" content="#131c28">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="apple-mobile-web-app-capable" content="yes" >
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+
+        <base href="/" />
+
+        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+        <link rel="shortcut icon" href="/favicon.ico">
+
+        <link rel="stylesheet" type="text/css" href="/styles/style.css">
+
+        <script src="/scripts/common.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+        <title th:text="${title}"></title>
+
+        <script th:inline="javascript">
+            var ServerData = {
+                'nickname' : [[${nickname}]],
+                'role' : [[${role}]]
+            };
+        </script>
+    </div>
+</body>
+</html>
