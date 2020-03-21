@@ -38,11 +38,7 @@
             let dashboardBody = document.getElementById('dashboard-body');
             window.dashboard = dashboard;
 
-            dashboardHead.style.minHeight = document.getElementById('header-wrapper').clientHeight - 1 + 'px';
-            dashboardHead.style.maxHeight = document.getElementById('header-wrapper').clientHeight - 1 + 'px';
-
-            dashboardBody.style.minHeight = window.innerHeight - dashboardHead.offsetHeight - 15 + 'px';
-            dashboardBody.style.maxHeight = window.innerHeight - dashboardHead.offsetHeight - 15 + 'px';
+            resizeDashboard();
 
             loadDashboardMenuItems(ITEMS);
             //customiseSelect();
@@ -78,7 +74,62 @@
                 };
 
                 dashboardBody.appendChild(item);
+            };
+
+            function resizeDashboard(){
+                dashboardHead.style.minHeight = document.getElementById('header-wrapper').clientHeight - 1 + 'px';
+                dashboardHead.style.maxHeight = document.getElementById('header-wrapper').clientHeight - 1 + 'px';
+
+                dashboardBody.style.minHeight = window.innerHeight - dashboardHead.offsetHeight - 15 + 'px';
+                dashboardBody.style.maxHeight = window.innerHeight - dashboardHead.offsetHeight - 15 + 'px';
             }
+
+            window.showDashboard = function() {
+                resizeDashboard();
+
+                let timer, timePassed, start = Date.now();
+
+                timer = setInterval(function() {
+                    timePassed = Date.now() - start;
+                    if(timePassed > 250){
+                        if(!window.isSmallScreen())window.mainWrapper.style.gridTemplateColumns = "250px auto";
+                        window.dashboard.style.left = "0px";
+                        clearInterval(timer);
+                        window.onclick = function(e){
+                            if(window.isSmallScreen()){
+                                e = e || window.event;
+                                if(window.getClickedElement(e) !== window.dashboard.id){
+                                    hideDashboard();
+                                    window.onclick = null;
+                                }
+                            }
+                        };
+                        return;
+                    }
+                    if(!window.isSmallScreen()) window.mainWrapper.style.gridTemplateColumns = timePassed + "px auto";
+                    window.dashboard.style.left = (timePassed - 250) + "px"
+                }, 20);
+            };
+
+            window.hideDashboard = function() {
+                let timer, timePassed, start = Date.now();
+
+                timer = setInterval(function() {
+                    timePassed = Date.now() - start;
+                    if(timePassed > 250){
+                        if(!window.isSmallScreen())window.mainWrapper.style.gridTemplateColumns = "0px auto";
+                        window.dashboard.style.left = "-250px";
+                        clearInterval(timer);
+                        return;
+                    }
+                    if(!window.isSmallScreen()) window.mainWrapper.style.gridTemplateColumns = (250 - timePassed) + "px auto";
+                    window.dashboard.style.left = -timePassed + "px";
+                }, 20);
+            };
+
+            window.isShowDashboard = function() {
+                return window.dashboard.offsetLeft > -250;
+            };
 
             function customiseSelect() {
                 let x, i, j, selElmnt, a, b, c;

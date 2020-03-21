@@ -30,58 +30,13 @@
             };
 
             document.getElementById('dashboard-switch').onclick = function(){
-                if(isShowDashboard()){
-                    hideDashboard();
+                if(window.isShowDashboard()){
+                    window.hideDashboard();
                 }
                 else{
-                    showDashboard();
+                    window.showDashboard();
                 }
             };
-
-            function showDashboard() {
-                let timer, timePassed, start = Date.now();
-
-                timer = setInterval(function() {
-                    timePassed = Date.now() - start;
-                    if(timePassed > 250){
-                        if(!window.isSmallScreen())window.mainWrapper.style.gridTemplateColumns = "250px auto";
-                        window.dashboard.style.left = "0px";
-                        clearInterval(timer);
-                        window.onclick = function(e){
-                            if(window.isSmallScreen()){
-                                e = e || window.event;
-                                if(window.getClickedElement(e) !== window.dashboard.id){
-                                    hideDashboard();
-                                    window.onclick = null;
-                                }
-                            }
-                        };
-                        return;
-                    }
-                    if(!window.isSmallScreen()) window.mainWrapper.style.gridTemplateColumns = timePassed + "px auto";
-                    window.dashboard.style.left = (timePassed - 250) + "px"
-                }, 20);
-            }
-
-            function hideDashboard() {
-                let timer, timePassed, start = Date.now();
-
-                timer = setInterval(function() {
-                    timePassed = Date.now() - start;
-                    if(timePassed > 250){
-                        if(!window.isSmallScreen())window.mainWrapper.style.gridTemplateColumns = "0px auto";
-                        window.dashboard.style.left = "-250px";
-                        clearInterval(timer);
-                        return;
-                    }
-                    if(!window.isSmallScreen()) window.mainWrapper.style.gridTemplateColumns = (250 - timePassed) + "px auto";
-                    window.dashboard.style.left = -timePassed + "px";
-                }, 20);
-            }
-
-            function isShowDashboard() {
-                return window.dashboard.offsetLeft > -250;
-            }
         }
     }
 </script>
