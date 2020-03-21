@@ -249,7 +249,7 @@
 
         display: grid;
         grid-template-columns: 100%;
-        grid-template-rows: auto 250px;
+        grid-template-rows: 40px 250px;
         grid-template-areas:
                 "graph-card-header"
                 "graph-card-content";
@@ -271,6 +271,13 @@
         overflow-y: hidden;
     }
 
+    .title{
+        grid-area: title;
+
+        text-align: left;
+        line-height: 40px;
+    }
+
     .space{
         grid-area: space;
     }
@@ -278,6 +285,7 @@
 
     .time-range{
         background: transparent;
+        width: 80px;
         grid-area: time-range;
         margin: auto;
         border: none;
