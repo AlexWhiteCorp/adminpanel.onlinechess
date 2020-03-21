@@ -159,10 +159,10 @@
 </script>
 <style scope>
     .dashboard-wrapper{
-        position: absolute;
+        position: fixed;
+        z-index: 200;
         left: 0;
         top: 0;
-        z-index: 10;
         width: 250px;
         background-color: #18191a;
         background: linear-gradient(rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.75)), url(/images/dashboard-background.png);

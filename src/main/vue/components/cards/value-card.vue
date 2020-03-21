@@ -105,15 +105,13 @@
     }
 
     .progress-bar{
+        z-index: 1;
         grid-area: progress-bar;
+        background: white;
         width: auto;
         height: 2px;
         margin: 9px 0px 9px 0px;
-    }
-
-    .progress-bar {
         border: none;
-        background: white;
     }
 
     .progress-bar-blue-green::-webkit-progress-value {

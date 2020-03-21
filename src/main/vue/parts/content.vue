@@ -23,8 +23,11 @@
         },
         mounted(){
             let content = document.getElementById('content-wrapper');
-            content.style.maxHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
-            content.style.minHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
+
+            if(!isSmallScreen()){
+                content.style.maxHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
+                content.style.minHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
+            }
         }
     }
 </script>
@@ -71,9 +74,6 @@
         font-size: 14px;
         letter-spacing: 1px;
     }
-
-
-
 
     .card-1-column{
         grid-column: span 1;
@@ -149,6 +149,9 @@
     }
 
     @media screen and (max-width: 641px){
+        .content-wrapper{
+        }
+
         .in-content-wrapper{
             grid-template-columns: 50% 50%;
         }
@@ -166,6 +169,13 @@
         .card-11-column,
         .card-10-column{
             grid-column: span 2;
+        }
+    }
+
+    @media screen and (max-width: 1025px){
+        .content-card{
+            margin-left: 0px;
+            margin-right: 0px;
         }
     }
 </style>

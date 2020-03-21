@@ -54,7 +54,8 @@
 
             let showingUserPopupContainer = false;
 
-            userPopupContainer.style.top = '-2px';
+            if(isSmallScreen())userPopupContainer.style.top = '64px';
+            else userPopupContainer.style.top = '60px';
             userPopupContainer.style.minWidth = 250 + 'px';
             userPopupContainer.childNodes[0].style.minHeight = '45px';
             userPopupContainer.style.right = 0 + 'px';
@@ -118,7 +119,7 @@
 <style>
     .popup-container{
         position: fixed;
-        z-index: 7;
+        z-index: 150;
         background: #18191a;
         min-width: 250px;
         max-width: 250px;
@@ -126,10 +127,7 @@
         max-height: 30px;
         padding: 10px 0px 5px 0px;
 
-        border: 2px solid #313233;
-        border-radius: 5px;
-        border-top-left-radius: 0px;
-        border-top-right-radius: 0px;
+        border: 1px solid #313233;
         box-shadow: 0px 5px 15px #242526;
 
         overflow: hidden;

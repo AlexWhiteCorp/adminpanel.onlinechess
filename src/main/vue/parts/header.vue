@@ -126,4 +126,14 @@
         margin: 10px 30px 10px 10px;
         cursor: pointer;
     }
+
+    @media screen and (max-width: 1025px){
+        .header-wrapper{
+            position: fixed;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+    }
 </style>
