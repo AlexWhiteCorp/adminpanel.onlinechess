@@ -22,12 +22,7 @@
         methods: {
         },
         mounted(){
-            let content = document.getElementById('content-wrapper');
-
-            if(!isSmallScreen()){
-                content.style.maxHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
-                content.style.minHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
-            }
+            resizeContent();
         }
     }
 </script>

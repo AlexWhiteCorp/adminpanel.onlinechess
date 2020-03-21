@@ -14,3 +14,10 @@ window.isSmallScreen = function () {
 window.getRestPath = function (page) {
   return '/rest/' + page;
 };
+
+window.resizeContent = function () {
+    if(!isSmallScreen()){
+        document.getElementById('content-wrapper').style.maxHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
+        document.getElementById('content-wrapper').style.minHeight = document.body.offsetHeight - window.header.offsetHeight + 'px';
+    }
+};

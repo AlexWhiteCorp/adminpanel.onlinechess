@@ -113,11 +113,11 @@
                 loadData(data);
             });
 
-            card.style.minHeight = document.getElementById('content-wrapper').offsetHeight - 110 + 'px';
-            document.getElementById('users-table').style.maxHeight = document.getElementById('content-wrapper').offsetHeight - 150 + 'px';
+            card.style.minHeight = window.innerHeight - 110 + 'px';
+            document.getElementById('users-table').style.maxHeight = window.innerHeight - 150 + 'px';
 
-            usersTableContent.style.minHeight = document.getElementById('content-wrapper').offsetHeight - 200 + 'px';
-            usersTableContent.style.maxHeight = document.getElementById('content-wrapper').offsetHeight - 200 + 'px';
+            usersTableContent.style.minHeight = window.innerHeight - 200 + 'px';
+            usersTableContent.style.maxHeight = window.innerHeight - 200 + 'px';
 
             
             function request(path, params, onResult) {
