@@ -2,7 +2,10 @@ package com.alexcorp.oc.adminpanel.services;
 
 import com.alexcorp.oc.adminpanel.domains.User;
 import com.alexcorp.oc.adminpanel.repositories.UserRepository;
+import com.alexcorp.oc.adminpanel.repositories.filters.UsersFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +25,12 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    public Page findAllByFilters(String json, Pageable pageable){
+        if(json.isEmpty()) return userRepository.findAll(pageable);
+
+        return userRepository.findAll(new UsersFilter(json), pageable);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String nickname) throws UsernameNotFoundException {
@@ -47,7 +56,7 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(oldUser);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(oldUser.getUsername(), oldUser.getPassword(), oldUser.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        /*Authentication authentication = new UsernamePasswordAuthenticationToken(oldUser.getUsername(), oldUser.getPassword(), oldUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);*/
     }
 }

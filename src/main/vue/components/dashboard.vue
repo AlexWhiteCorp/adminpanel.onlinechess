@@ -74,15 +74,19 @@
                 };
 
                 dashboardBody.appendChild(item);
-            };
+            }
 
             function resizeDashboard(){
+                dashboard.style.minHeight = window.innerHeight + 'px';
+
                 dashboardHead.style.minHeight = document.getElementById('header-wrapper').clientHeight - 1 + 'px';
                 dashboardHead.style.maxHeight = document.getElementById('header-wrapper').clientHeight - 1 + 'px';
 
                 dashboardBody.style.minHeight = window.innerHeight - dashboardHead.offsetHeight - 15 + 'px';
                 dashboardBody.style.maxHeight = window.innerHeight - dashboardHead.offsetHeight - 15 + 'px';
             }
+
+            window.addEventListener('resize', resizeDashboard);
 
             window.showDashboard = function() {
                 resizeDashboard();
@@ -217,6 +221,7 @@
         width: 250px;
         background-color: #18191a;
         background: linear-gradient(rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.75)), url(/images/dashboard-background.png);
+        background-size: cover;
         border: 1px solid #262727;
         border-left: none;
     }

@@ -1,7 +1,9 @@
 <template>
     <div id="content-wrapper" class="content-wrapper content-grid-cell scrollable">
         <transition name="fade">
-            <router-view></router-view>
+            <keep-alive>
+                <router-view></router-view>
+            </keep-alive>
         </transition>
         <footer-wrapper/>
     </div>
@@ -22,7 +24,47 @@
         methods: {
         },
         mounted(){
+            const Component = this;
+
             resizeContent();
+
+            let content = document.getElementById('content-wrapper');
+
+            let keys = {37: 1, 38: 1, 39: 1, 40: 1};
+
+            function preventDefault(e) {
+                e = e || content.event;
+                if (e.preventDefault)
+                    e.preventDefault();
+                e.returnValue = false;
+            }
+
+            function preventDefaultForScrollKeys(e) {
+                if (keys[e.keyCode]) {
+                    preventDefault(e);
+                    return false;
+                }
+            }
+
+            function disableScroll() {
+                if (content.addEventListener) // older FF
+                    content.addEventListener('DOMMouseScroll', preventDefault, false);
+                content.addEventListener('wheel', preventDefault, {passive: false}); // Disable scrolling in Chrome
+                content.onwheel = preventDefault; // modern standard
+                content.onmousewheel = content.onmousewheel = preventDefault; // older browsers, IE
+                content.ontouchmove  = preventDefault; // mobile
+                content.onkeydown  = preventDefaultForScrollKeys;
+            }
+
+            function enableScroll() {
+                if (content.removeEventListener)
+                    content.removeEventListener('DOMMouseScroll', preventDefault, false);
+                content.removeEventListener('wheel', preventDefault, {passive: false}); // Enable scrolling in Chrome
+                content.onmousewheel = content.onmousewheel = null;
+                content.onwheel = null;
+                content.ontouchmove = null;
+                content.onkeydown = null;
+            }
         }
     }
 </script>

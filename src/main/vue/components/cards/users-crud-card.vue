@@ -14,6 +14,7 @@
                 Save
             </div>
         </div>
+
         <div id="users-table" class="users-table scrollable">
             <div id="users-table-filters" class="users-table-line users-table-filters">
                 <input type="text" class="users-table-cell user-id new-record-field" placeholder="All"/>
@@ -32,7 +33,7 @@
                         <option value="ALL">All</option>
                         <option value="PLAYER">PLAYER</option>
                         <option value="BOT">BOT</option>
-                        <option value="ADMIN">ADMIN</option>
+                        <option value="ADMIN" selected>ADMIN</option>
                     </select>
                 </div>
                 <div class="users-table-cell user-last-login disabled-field"></div>
@@ -48,7 +49,7 @@
                 <div class="users-table-cell">Options</div>
             </div>
             <div id="users-table-new-record" class="users-table-new-record users-table-line">
-                <div class="users-table-cell user-id disabled-field"></div>
+                <div class="users-table-cell user-id disabled-field">New</div>
                 <input type="text" class="users-table-cell user-nickname new-record-field" placeholder="Nickname"/>
                 <input type="text" class="users-table-cell user-password new-record-field" placeholder="Password"/>
                 <div class="user-active custom-select">
@@ -68,7 +69,16 @@
                 <div class="users-table-cell user-last-login disabled-field"></div>
                 <div id="new-record-cancel" class="users-table-cell user-options">Cancel</div>
             </div>
-            <div id="users-table-content" class="users-table-content"></div>
+
+            <div id="users-table-content" class="users-table-content scrollable"></div>
+        </div>
+
+        <div id="navigation-bar" class="navigation-bar">
+            <div id="nav-bar-prev" class="previous-page navigation-bar-button"> < </div>
+            <div id="nav-bar-first" class="first-page navigation-bar-page-number"> 1 </div>
+            <div class="curr-page navigation-bar-page-number"> 2 </div>
+            <div id="nav-bar-last" class="last-page navigation-bar-page-number"> 3 </div>
+            <div id="nav-bar-next" class="next-page navigation-bar-button"> > </div>
         </div>
     </div>
 </template>
@@ -87,14 +97,13 @@
         methods: {
         },
         mounted(){
+            const PAGE_SIZE = 20;
+            let PAGE_NUMBER = 0;
+            let TOTAL_PAGE_NUMBER = 0;
+
             const gridData = 'data-v-dfba836a';
-
-            const PLAYER = 'PLAYER';
-            const ADMIN = 'ADMIN';
-            const BOT = 'BOT';
-            const BOT_MANAGER = 'BOT_MAN';
-
-            const ACTIVE = 'ACTIVE';
+            const PLAYER = 'PLAYER', ADMIN = 'ADMIN', BOT = 'BOT', BOT_MANAGER = 'BOT_MAN';
+            const NONACTIVE = 'NONACTIVE', ACTIVE = 'ACTIVE', BANNED = 'BANNED';
 
             let card = document.getElementById('card');
             let usersTableContent = document.getElementById('users-table-content');
@@ -109,152 +118,15 @@
             let id = card.getAttribute('card-id').toLowerCase().replace(/ /g, '-');
             card.id = id + '-card';
 
-            request('users', {}, function (data) {
-                loadData(data);
-            });
-
             card.style.minHeight = window.innerHeight - 110 + 'px';
-            document.getElementById('users-table').style.maxHeight = window.innerHeight - 150 + 'px';
+            document.getElementById('users-table').style.maxHeight = window.innerHeight - 180 + 'px';
+            //usersTableContent.style.minHeight = window.innerHeight - 200 + 'px';
+            usersTableContent.style.maxHeight = window.innerHeight - 260 + 'px';
 
-            usersTableContent.style.minHeight = window.innerHeight - 200 + 'px';
-            usersTableContent.style.maxHeight = window.innerHeight - 200 + 'px';
+            customiseSelect();
+            requestByFilters();
 
-            
-            function request(path, params, onResult) {
-                axios
-                    .get(window.getRestPath(path), {params: params})
-                    .then(function(responce){
-                        console.log(responce.data);
-
-                        onResult(responce.data);
-                    });
-            }
-
-            function loadData(data) {
-                usersTableContent.innerText = '';
-
-                for(let i in data){
-                    localStorage.setItem(data[i]['id'], JSON.stringify(data[i]));
-
-                    let record = document.createElement('div');
-                    record.setAttribute(gridData, '');
-                    record.id = 'user-id-' + data[i]['id'];
-                    record.className = 'users-table-record users-table-line';
-
-                    let userId = document.createElement('div');
-                    userId.setAttribute(gridData, '');
-                    userId.className = 'users-table-cell user-id';
-                    userId.innerText = data[i]['id'];
-                    record.appendChild(userId);
-
-                    let userNickname = document.createElement('input');
-                    userNickname.setAttribute(gridData, '');
-                    userNickname.className = 'users-table-cell user-nickname';
-                    userNickname.value = data[i]['nickname'];
-                    userNickname.setAttribute('readonly', true);
-                    record.appendChild(userNickname);
-
-                    let userPassword = document.createElement('input');
-                    userPassword.setAttribute(gridData, '');
-                    userPassword.className = 'users-table-cell user-password';
-                    userPassword.placeholder = '••••••••';
-                    userPassword.setAttribute('readonly', true);
-                    userPassword.setAttribute('type', 'password');
-                    record.appendChild(userPassword);
-
-                    let userStatus = document.createElement('div');
-                    userStatus.setAttribute(gridData, '');
-                    userStatus.className = 'user-active custom-select';
-                    let userStatusSelect = createSelect(data[i]['id'], [ACTIVE, 'NONACTIVE', 'BANNED'], data[i]['active']);
-                    userStatus.setAttribute('readonly', true);
-                    userStatus.appendChild(userStatusSelect);
-                    record.appendChild(userStatus);
-
-                    let userRole = document.createElement('div');
-                    userRole.setAttribute(gridData, '');
-                    userRole.className = 'user-role custom-select';
-                    let userRoleSelect = createSelect(data[i]['id'], [PLAYER, BOT, ADMIN], data[i]['role']);
-                    userRole.setAttribute('readonly', true);
-                    userRole.appendChild(userRoleSelect);
-                    record.appendChild(userRole);
-
-                    let userLastLogin = document.createElement('div');
-                    userLastLogin.setAttribute(gridData, '');
-                    userLastLogin.className = 'users-table-cell user-last-login';
-                    if (data[i]['lastLogin'] !== null)
-                        userLastLogin.innerText = moment(parseInt(data[i]['lastLogin'])).format('DD.MM.YYYY H:mm');
-                    else
-                        userLastLogin.innerText = '-';
-                    record.appendChild(userLastLogin);
-
-                    let userOptionEdit = document.createElement('div');
-                    userOptionEdit.setAttribute(gridData, '');
-                    userOptionEdit.setAttribute('user-id', data[i]['id']);
-                    userOptionEdit.className = 'users-table-cell user-options';
-                    userOptionEdit.innerText = 'Edit';
-
-                    userOptionEdit.onclick = function(){
-                        let userId = this.getAttribute('user-id');
-                        let record = document.getElementById('user-id-' + userId);
-
-                        record.childNodes[1].removeAttribute('readonly');
-                        record.childNodes[2].removeAttribute('readonly');
-                        record.childNodes[3].removeAttribute('readonly');
-                        record.childNodes[4].removeAttribute('readonly');
-                        record.childNodes[5].className += ' disabled-field';
-                        record.childNodes[6].style.display = 'none';
-                        record.childNodes[7].style.display = 'block';
-                        record.className += ' edited-record';
-
-                        saveChangesButton.onmouseover();
-                    };
-
-                    record.appendChild(userOptionEdit);
-
-                    let userOptionCancel = document.createElement('div');
-                    userOptionCancel.setAttribute(gridData, '');
-                    userOptionCancel.setAttribute('user-id', data[i]['id']);
-                    userOptionCancel.className = 'users-table-cell user-options';
-                    userOptionCancel.innerText = 'Cancel';
-                    userOptionCancel.style.display = 'none';
-
-                    userOptionCancel.onclick = function(){
-                        let userId = this.getAttribute('user-id');
-                        let record = document.getElementById('user-id-' + userId);
-
-                        record.childNodes[1].setAttribute('readonly', true);
-                        record.childNodes[2].setAttribute('readonly', true);
-                        record.childNodes[3].setAttribute('readonly', true);
-                        record.childNodes[4].setAttribute('readonly', true);
-                        record.childNodes[5].className = record.childNodes[5].className.replace(' disabled-field', '');
-                        record.childNodes[6].style.display = 'block';
-                        record.childNodes[7].style.display = 'none';
-                        record.className = record.className.replace('edited-record', '');
-
-                        let user = JSON.parse(localStorage.getItem(userId));
-                        record.childNodes[0].innerText = user.id;
-                        record.childNodes[1].value = user.nickname;
-                        record.childNodes[2].placeholder = '••••••••';
-                        record.childNodes[3].appendChild(createSelect(data[i]['id'], [ACTIVE, 'NONACTIVE', 'BANNED'], user.active));
-                        record.childNodes[4].appendChild(createSelect(data[i]['id'], [PLAYER, BOT, ADMIN], user.role));
-                        if (data[i]['lastLogin'] !== null)
-                            userLastLogin.innerText = moment(parseInt(data[i]['lastLogin'])).format('DD.MM.YYYY H:mm');
-                        else
-                            userLastLogin.innerText = '-';
-
-                        if(document.getElementsByClassName('edited-record').length === 0){
-                            saveChangesButton.onmouseout();
-                        }
-                    };
-
-                    record.appendChild(userOptionCancel);
-
-                    usersTableContent.appendChild(record);
-                }
-
-                customiseSelect();
-            }
-
+            /////   Save Changes Option   /////
             saveChangesButton.onclick = function () {
                 if(newRecordDiv.style.height.indexOf('0') > 0){
                     let user = {
@@ -279,15 +151,7 @@
                 let changedRecords = document.getElementsByClassName('edited-record');
                 for(let i = 0; i < changedRecords.length; i++){
                     let record = changedRecords[i];
-                    console.log(changedRecords);
-                    record.className = record.className.replace('edited-record', '');
-                    record.childNodes[1].setAttribute('readonly', true);
-                    record.childNodes[2].setAttribute('readonly', true);
-                    record.childNodes[3].setAttribute('readonly', true);
-                    record.childNodes[4].setAttribute('readonly', true);
-                    record.childNodes[5].className = record.childNodes[5].className.replace(' disabled-field', '');
-                    record.childNodes[6].style.display = 'block';
-                    record.childNodes[7].style.display = 'none';
+                    onRecordCancel(record);
 
                     let userId = record.id.replace('user-id-', '');
 
@@ -310,12 +174,10 @@
                     });
                 }
             };
-
             saveChangesButton.onmouseover = function () {
                 saveChangesButton.style.width = '80px';
                 saveChangesButton.style.paddingRight = '5px';
             };
-
             saveChangesButton.onmouseout = function () {
                 if(document.getElementsByClassName('edited-record').length === 0 && newRecordDiv.style.height.indexOf('0') <= 0){
                     saveChangesButton.style.width = '28px';
@@ -323,15 +185,14 @@
                 }
             };
 
+            /////   New Account Option   /////
             newAccountButton.onclick = function () {
                 showNewRecord(true);
             };
-
             newAccountButton.onmouseover = function () {
                 newAccountButton.style.width = '145px';
                 newAccountButton.style.paddingRight = '5px';
             };
-
             newAccountButton.onmouseout = function () {
                 if(newRecordDiv.style.height.indexOf('0') <= 0){
                     newAccountButton.style.width = '28px';
@@ -360,15 +221,14 @@
                 }
             }
 
+            /////   Find Option, Filters  /////
             findButton.onclick = function () {
                 showFilters(true);
             };
-
             findButton.onmouseover = function () {
                 findButton.style.width = '90px';
                 findButton.style.paddingRight = '5px';
             };
-
             findButton.onmouseout = function () {
                 if(filtersDiv.style.height.indexOf('0') <= 0){
                     findButton.style.width = '28px';
@@ -380,8 +240,6 @@
                 showFilters(false);
                 requestByFilters();
             };
-
-            console.log(filtersDiv.childNodes);
 
             filtersDiv.childNodes[0].onchange = requestByFilters;
             filtersDiv.childNodes[2].onchange = requestByFilters;
@@ -417,7 +275,10 @@
                 search = search.substring(0, search.length - 1);
 
                 let params = {};
-                if(search.length !== 0) params.search = search;
+                if(search.length !== 0)
+                    params.search = search;
+                params.page = PAGE_NUMBER;
+                params.size = PAGE_SIZE;
 
                 request('users', params, function (data) {
                     if(data.error === undefined){
@@ -429,6 +290,155 @@
                 })
             }
 
+            ///// Data Options /////
+            function request(path, params, onResult) {
+                axios
+                    .get(window.getRestPath(path), {params: params})
+                    .then(function(responce){
+                        console.log(responce.data);
+
+                        onResult(responce.data);
+                    });
+            }
+
+            function loadData(json) {
+                usersTableContent.innerHTML = '';
+
+                let data = json.content;
+                setPagesNumber(json.number, json.totalPages, json.first, json.last);
+
+                for(let i in data){
+                    localStorage.setItem(data[i]['id'], JSON.stringify(data[i]));
+
+                    let record = createDiv('users-table-record-' + data[i]['id'],
+                                           'users-table-record users-table-line',
+                                           '', {[gridData] : ''});
+
+                    let userId = createDiv('users-table-record-id-' + data[i]['id'],
+                                            'users-table-cell users-id',
+                                            data[i]['id'], {[gridData] : ''});
+                    record.appendChild(userId);
+
+                    let userNickname = createInput('users-table-record-nickname-' + data[i]['id'],
+                                                'users-table-cell user-nickname',
+                                                data[i]['nickname'], {readonly : true, [gridData] : ''});
+                    record.appendChild(userNickname);
+
+                    let userPassword = createInput('users-table-record-password-' + data[i]['id'],
+                        'users-table-cell user-password',
+                        '', {[gridData] : '', readonly : true, type : 'password', placeholder : '••••••••'});
+                    record.appendChild(userPassword);
+
+                    let userStatus = createDiv('users-table-record-status-' + data[i]['id'],
+                                                'user-active custom-select',
+                                                '', {[gridData] : '', readonly : true});
+                    let userStatusSelect = createSelect(data[i]['id'], [ACTIVE, NONACTIVE, BANNED], data[i]['active']);
+                    userStatus.appendChild(userStatusSelect);
+                    record.appendChild(userStatus);
+
+                    let userRole = createDiv('users-table-record-role-' + data[i]['id'],
+                                            'user-role custom-select',
+                                            '', {[gridData] : '', readonly : true});
+                    let userRoleSelect = createSelect(data[i]['id'], [PLAYER, BOT, ADMIN], data[i]['role']);
+                    userRole.appendChild(userRoleSelect);
+                    record.appendChild(userRole);
+
+                    let userLastLogin = createDiv('users-table-record-last-login-' + data[i]['id'],
+                                                    'users-table-cell users-last-login',
+                                                    normalizeDate(data[i]['lastLogin']), {[gridData] : ''});
+                    record.appendChild(userLastLogin);
+
+                    let userOptionEdit = createDiv('users-table-record-edit-' + data[i]['id'],
+                        'users-table-cell user-options',
+                        'Edit', {[gridData] : '', 'user-id' :  data[i]['id']});
+
+                    userOptionEdit.onclick = function(){
+                        onRecordEdit(document.getElementById('users-table-record-' + this.getAttribute('user-id')));
+                        saveChangesButton.onmouseover();
+                    };
+                    record.appendChild(userOptionEdit);
+
+                    let userOptionCancel = createDiv('users-table-record-cancel-' + data[i]['id'],
+                        'users-table-cell user-options',
+                        'Cancel', {[gridData] : '', 'user-id' :  data[i]['id']});
+                    userOptionCancel.style.display = 'none';
+
+                    userOptionCancel.onclick = function(){
+                        onRecordCancel(document.getElementById('users-table-record-' + this.getAttribute('user-id')));
+
+                        let user = JSON.parse(localStorage.getItem(userId));
+
+                        record.childNodes[0].innerText = user.id;
+                        record.childNodes[1].value = user.nickname;
+                        record.childNodes[2].placeholder = '••••••••';
+                        record.childNodes[3].appendChild(createSelect(data[i]['id'], [ACTIVE, 'NONACTIVE', 'BANNED'], user.active));
+                        record.childNodes[4].appendChild(createSelect(data[i]['id'], [PLAYER, BOT, ADMIN], user.role));
+
+                        userLastLogin.innerText = normalizeDate(data[i]['lastLogin']);
+
+                        if(document.getElementsByClassName('edited-record').length === 0){
+                            saveChangesButton.onmouseout();
+                        }
+                    };
+                    record.appendChild(userOptionCancel);
+
+                    usersTableContent.appendChild(record);
+                }
+
+                customiseSelect();
+            }
+
+            function setPagesNumber(number, total, isFirst, isLast) {
+                PAGE_NUMBER = number;
+                TOTAL_PAGE_NUMBER = total;
+
+                let navBar = document.getElementById('navigation-bar').childNodes;
+
+                if(isFirst) {
+                    navBar[0].style.visibility = 'hidden';
+                    navBar[2].style.visibility = 'hidden';
+                }
+                else {
+                    navBar[0].style.visibility = 'unset';
+                    navBar[2].style.visibility = 'unset';
+                }
+
+                navBar[4].innerText = number + 1;
+                navBar[6].innerText = total;
+
+                if(isLast) {
+                    navBar[6].style.visibility = 'hidden';
+                    navBar[8].style.visibility = 'hidden';
+                }
+                else {
+                    navBar[6].style.visibility = 'unset';
+                    navBar[8].style.visibility = 'unset';
+                }
+            }
+
+            document.getElementById('nav-bar-prev').onclick = function () {
+                if(PAGE_NUMBER > 1){
+                    PAGE_NUMBER--;
+                    requestByFilters();
+                }
+            };
+            document.getElementById('nav-bar-first').onclick = function () {
+                PAGE_NUMBER = 0;
+                requestByFilters();
+            };
+            document.getElementById('nav-bar-last').onclick = function () {
+                PAGE_NUMBER = TOTAL_PAGE_NUMBER - 1;
+                requestByFilters();
+
+            };
+            document.getElementById('nav-bar-next').onclick = function () {
+                if(PAGE_NUMBER < TOTAL_PAGE_NUMBER){
+                    PAGE_NUMBER++;
+                    requestByFilters();
+                }
+            };
+
+            /////   Custom select   /////
             function createSelect(userId, items, selectedItem) {
                 let select = document.createElement('select');
                 select.style.display = 'none';
@@ -523,6 +533,65 @@
                         x[i].classList.add("select-hide");
                     }
                 }
+            }
+
+            /////   Elements Creation   /////
+            function createDiv(id, classes, text, attrs) {
+                let div = document.createElement('div');
+                div.id = id;
+                div.className = classes;
+                div.innerText = text;
+
+                for(let attr in attrs){
+                    div.setAttribute(attr, attrs[attr]);
+                }
+
+                return div;
+            }
+
+            function createInput(id, classes, value, attrs) {
+                let input = document.createElement('input');
+                input.id = id;
+                input.className = classes;
+                input.value = value;
+
+                for(let attr in attrs){
+                    input.setAttribute(attr, attrs[attr]);
+                }
+
+                return input;
+            }
+
+            /////   Internal   /////
+            function onRecordEdit(record) {
+                record.childNodes[0].className += ' disabled-field';
+                record.childNodes[1].removeAttribute('readonly');
+                record.childNodes[2].removeAttribute('readonly');
+                record.childNodes[3].removeAttribute('readonly');
+                record.childNodes[4].removeAttribute('readonly');
+                record.childNodes[5].className += ' disabled-field';
+                record.childNodes[6].style.display = 'none';
+                record.childNodes[7].style.display = 'block';
+                record.className += ' edited-record';
+            }
+
+            function onRecordCancel(record) {
+                record.childNodes[0].className = record.childNodes[0].className.replace(' disabled-field', '');
+                record.childNodes[1].setAttribute('readonly', true);
+                record.childNodes[2].setAttribute('readonly', true);
+                record.childNodes[3].setAttribute('readonly', true);
+                record.childNodes[4].setAttribute('readonly', true);
+                record.childNodes[5].className = record.childNodes[5].className.replace(' disabled-field', '');
+                record.childNodes[6].style.display = 'block';
+                record.childNodes[7].style.display = 'none';
+                record.className = record.className.replace('edited-record', '');
+            }
+
+            function normalizeDate(date) {
+                if (date !== null)
+                    return moment(parseInt(date)).format('DD.MM.YYYY H:mm');
+                else
+                    return '-';
             }
         }
     }
@@ -629,7 +698,7 @@
     }
 
     .users-table{
-        overflow: auto;
+        overflow-y: hidden;
     }
 
     .users-table-header{
@@ -654,7 +723,6 @@
 
     .users-table-line{
         display: grid;
-        grid-gap: 0px;
         grid-template-columns: 60px auto 150px 140px 120px 150px 100px;
         grid-template-rows: 40px;
         grid-template-areas: "id nickname password active role last-login options";
@@ -743,22 +811,66 @@
         box-shadow: inset 0px 0px 35px #18191a;
     }
 
+    .navigation-bar{
+        display: grid;
+        grid-template-columns: auto 30px 45px 45px 45px 30px auto;
+        grid-template-areas: ". previous first curr last next .";
+        margin-top: 10px;
+    }
 
+    .navigation-bar-button{
+        background: #e4e6eb;
+        cursor: pointer;
+        border-radius: 10px;
 
+        color: #242526;
+        font-size: 28px;
+        font-weight: bold;
+        line-height: 30px;
+    }
+
+    .navigation-bar-page-number{
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 30px;
+    }
+
+    .previous-page{
+        grid-area: previous;
+    }
+
+    .first-page{
+        grid-area: first;
+        cursor: pointer;
+    }
+
+    .curr-page{
+        grid-area: curr;
+
+        font-size: 20px;
+        border: 1px solid #e4e6eb;
+        border-radius: 10px;
+    }
+
+    .last-page{
+        grid-area: last;
+        cursor: pointer;
+    }
+
+    .next-page{
+        grid-area: next;
+    }
 
     /* The container must be positioned relative: */
     .custom-select {
         background: inherit;
         position: relative;
     }
-
     .custom-select select{
         display: none; /*hide original SELECT element: */
     }
-
     .select-selected {
     }
-
     /* Style the arrow inside the select element: */
     .select-selected:after {
         position: absolute;
@@ -770,13 +882,11 @@
         border: 6px solid transparent;
         border-color: #fff transparent transparent transparent;
     }
-
     /* Point the arrow upwards when the select box is open (active): */
     .select-selected.select-arrow-active:after {
         border-color: transparent transparent #fff transparent;
         top: 7px;
     }
-
     /* style the items (options), including the selected item: */
     .select-items div,.select-selected {
         color: #ffffff;
@@ -784,7 +894,6 @@
         border: 1px solid transparent;
         border-color: transparent transparent rgba(0, 0, 0, 0.1) transparent;
     }
-
     /* Style items (options): */
     .select-items {
         position: absolute;
@@ -793,12 +902,10 @@
         right: 0;
         z-index: 99;
     }
-
     /* Hide the items when the select box is closed: */
     .select-hide {
         display: none;
     }
-
     .select-items div:hover, .same-as-selected {
         background-color: rgba(0, 0, 0, 0.1);
     }
